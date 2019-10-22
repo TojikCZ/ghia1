@@ -1,0 +1,6 @@
+credential.cfg
+*.cfg
+venv
+.idea
+.env
+__pycache__
