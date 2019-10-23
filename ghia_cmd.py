@@ -83,8 +83,11 @@ def update_users(action, user_list, session, issue_number, ghia_params):
         if not ghia_params.dry_run:
             if update_assignee(action, username, session, ghia_params.owner, ghia_params.repo, issue_number):
                 namedrop_assignee(action, username)
+            else:
+                return False
         else:
             namedrop_assignee(action, username)
+    return True
 
 
 def get_next_page_link_from_request(request):
@@ -192,16 +195,20 @@ def assign_stuff_to_issue(issue, user_patterns, fallback_label, session, ghia_pa
     for username in sorted_leavable_users:
         namedrop_assignee(LEAVE, username)
 
+    success = True
+
     if ghia_params.strategy == "append":
-        update_users(ADD, sorted_addable_users, session, issue["number"], ghia_params)
+        success = update_users(ADD, sorted_addable_users, session, issue["number"], ghia_params)
 
     elif ghia_params.strategy == "set":
         if not assigned_users:
-            update_users(ADD, sorted_addable_users, session, issue["number"], ghia_params)
+            success = update_users(ADD, sorted_addable_users, session, issue["number"], ghia_params)
 
     elif ghia_params.strategy == "change":
-        update_users(REMOVE, sorted_removable_users, session, issue["number"], ghia_params)
-        update_users(ADD, sorted_addable_users, session, issue["number"], ghia_params)
+        if update_users(REMOVE, sorted_removable_users, session, issue["number"], ghia_params):
+            success = update_users(ADD, sorted_addable_users, session, issue["number"], ghia_params)
+        else:
+            success = False
 
     # ---- FALLBACK LABEL ----
 
@@ -216,7 +223,9 @@ def assign_stuff_to_issue(issue, user_patterns, fallback_label, session, ghia_pa
                                      json={"labels": issue_labels})
                     if r.status_code != 200:
                         write_error(f"Could not update issue {ghia_params.owner}/{ghia_params.repo}#{issue['number']}", 3)
+                        success = False
                 write_fallback(f"added label \"{fallback_label}\"")
+    return success
 
 
 @click.command()
