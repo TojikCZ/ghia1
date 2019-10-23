@@ -106,12 +106,14 @@ def create_app(some_argument):
 
             json_data = request.get_json()
 
-            if request.headers["X-GitHub-Event"] == "issues" and\
-                    json_data["action"] in REACT_TO:
+            if (request.headers["X-GitHub-Event"] == "issues" and
+                json_data["action"] in REACT_TO and
+                    json_data["issue"]["state"] == "open"):
                 react_to_hook(app, json_data)
             return ("", 200, None)
-        except:
-            return ("", 400, None)
+        except Exception as e:
+            print(e)
+            return ("", 403, None)
     return app
 
 
