@@ -11,7 +11,7 @@ setuptools.setup(
     long_description_content_type="text/plain",
     author='Tomáš Jozífek',
     author_email='tojik@tojik.cz',
-    keywords='github,issue,automation',
+    keywords='github,issue,automation,webapp',
     license='GNU GPLv3',
     url='https://github.com/TojikCZ/ghia1',
     packages=setuptools.find_packages(),
