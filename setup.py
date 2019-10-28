@@ -4,10 +4,11 @@ with open('README') as f:
     long_description = ''.join(f.readlines())
 
 setuptools.setup(
-    name='ghia',
+    name='ghia_joziftom',
     version='0.3',
     description='Assigns people to issues based on config files',
     long_description=long_description,
+    long_description_content_type="text/plain",
     author='Tomáš Jozífek',
     author_email='tojik@tojik.cz',
     keywords='github,issue,automation',
