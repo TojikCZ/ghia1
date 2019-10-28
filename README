@@ -1,6 +1,6 @@
 Command line tool to assign users to issues based on specified regular expressions.
 
-Usage: __main__.py [OPTIONS] REPOSLUG
+Usage: ghia [OPTIONS] REPOSLUG
 
   CLI tool for automatic issue assigning of GitHub issues
 

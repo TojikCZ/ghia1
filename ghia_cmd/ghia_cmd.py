@@ -200,7 +200,7 @@ def validate_file(ctx, param: click.core.Option, path: str):
     return cp
 
 
-@click.command(name="ghia")
+@click.command()
 @click.option("-s", "--strategy", default="append", show_default=True, type=click.Choice(["append", "set", "change"]),
               help="How to handle assignment collisions.")
 @click.option("-d", "--dry-run", is_flag=True,
