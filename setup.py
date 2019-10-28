@@ -1,0 +1,39 @@
+import setuptools
+
+with open('README') as f:
+    long_description = ''.join(f.readlines())
+
+setuptools.setup(
+    name='ghia',
+    version='0.3',
+    description='Assigns people to issues based on config files',
+    long_description=long_description,
+    author='Tomáš Jozífek',
+    author_email='tojik@tojik.cz',
+    keywords='github,issue,automation',
+    license='GNU GPLv3',
+    url='https://github.com/TojikCZ/ghia1',
+    packages=setuptools.find_packages(),
+    package_dir={'ghia_web': 'ghia_web'},
+    package_data={'ghia_web': ['templates/*.html', 'static/*.*', 'flask_config.json']},
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Environment :: Console',
+        'Environment :: Web Environment',
+        'Framework :: Flask',
+        'Topic :: Software Development :: Bug Tracking',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'Operating System :: POSIX :: Linux',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.7',
+        ],
+    entry_points={
+        'console_scripts': [
+            'ghia = ghia_cmd.ghia_cmd:ghia_cmd',
+        ],
+    },
+    install_requires=['Flask', 'click', 'requests'],
+    zip_safe=False,
+)

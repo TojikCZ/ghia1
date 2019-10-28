@@ -1,0 +1,4 @@
+include LICENSE
+recursive-include ghia_web/templates/ *.html
+recursive-include ghia_web/static/ *.*
+recursive-include ghia_web/flask_config.json

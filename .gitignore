@@ -4,3 +4,7 @@ venv
 .idea
 .env
 __pycache__
+test*
+dist
+build
+ghia.egg-info
