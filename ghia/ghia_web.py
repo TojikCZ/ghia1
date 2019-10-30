@@ -8,7 +8,7 @@ import click
 import hashlib
 import hmac
 
-from ghia_cmd import GHIASolver
+from ghia.ghia_cmd import GHIASolver
 
 REACT_TO = {"opened", "edited", "transferred", "reopened", "assigned", "unassigned", "labeled", "unlabeled"}
 

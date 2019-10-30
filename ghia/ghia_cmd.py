@@ -1,10 +1,9 @@
 #!/bin/python
 import configparser
-
-import click
 import re
 
-from github_communicator import RequestException, GithubCommunicator
+import click
+from ghia.github_communicator import RequestException, GithubCommunicator
 
 
 class GHIASolver:

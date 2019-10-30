@@ -5,7 +5,7 @@ with open('README') as f:
 
 setuptools.setup(
     name='ghia_joziftom',
-    version='0.3.1',
+    version='0.3.2',
     description='Assigns people to issues based on config files',
     long_description=long_description,
     long_description_content_type="text/plain",
@@ -15,8 +15,8 @@ setuptools.setup(
     license='GNU GPLv3',
     url='https://github.com/TojikCZ/ghia1',
     packages=setuptools.find_packages(),
-    package_dir={'ghia_web': 'ghia_web'},
-    package_data={'ghia_web': ['templates/*.html', 'static/*.*', 'flask_config.json']},
+    package_dir={'ghia': 'ghia'},
+    package_data={'ghia': ['templates/*.html', 'static/*.*', 'flask_config.json']},
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',
@@ -32,7 +32,7 @@ setuptools.setup(
         ],
     entry_points={
         'console_scripts': [
-            'ghia = ghia_cmd.ghia_cmd:ghia_cmd',
+            'ghia = ghia.ghia_cmd:ghia_cmd',
         ],
     },
     install_requires=['Flask', 'click', 'requests'],
