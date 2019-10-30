@@ -1,4 +1,4 @@
 include LICENSE
-recursive-include ghia_web/templates/ *.html
-recursive-include ghia_web/static/ *.*
-recursive-include ghia_web/ flask_config.json
+recursive-include ghia/templates/ *.html
+recursive-include ghia/static/ *.*
+recursive-include ghia/ flask_config.json
