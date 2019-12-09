@@ -12,6 +12,20 @@ class GHIASolver:
     LEAVE = 2
 
     def __init__(self, config_auth, config_rules, reposlug, strategy="append", dry_run=False):
+        """
+        Initializes the solver
+
+        Strategy options are:
+        append - adds new users to an issue
+        set - sets users matching config if there are none set
+        change - removes whoever is assigned and adds those matching config
+
+        :param config_auth: Config parser object with auth config file open as specified in the homework assignment
+        :param config_rules: Config parser object with rules config file open as specified in the homework assignment
+        :param reposlug: A string containing f"{repo_owner}/{repo_name}"
+        :param strategy: What strategy is to be used options: "append", "set", "change"
+        :param dry_run: boolean saying whether changes are to be persisted or not
+        """
         self.reposlug = reposlug
         self.owner, self.repo = self.reposlug
         self.strategy = strategy
@@ -27,6 +41,11 @@ class GHIASolver:
         self.issue_list = []
 
     def solve(self):
+        """
+        Gets stuff done. Call after you are happy with the configuration of the solver
+
+        :return: well thanks pycharm for generating this useless field. This method does not return anything useful
+        """
         try:
             self.issue_list = self.hubcom.get_issue_list()
         except RequestException as e:
@@ -36,6 +55,13 @@ class GHIASolver:
             self.assign_stuff_to_issue(issue)
 
     def change_config(self, reposlug, strategy=None, dry_run=None):
+        """
+        Sets multiple things at once, otherwise it's a boring setter
+
+        :param reposlug: A string containing f"{repo_owner}/{repo_name}"
+        :param strategy: What strategy is to be used options: "append", "set", "change"
+        :param dry_run: boolean saying whether changes are to be persisted or not
+        """
         self.reposlug = reposlug
         self.owner, self.repo = self.reposlug
 
@@ -46,6 +72,12 @@ class GHIASolver:
             self.dry_run = dry_run
 
     def get_user_patterns(self):
+        """
+        Prepares the data from the rule config
+
+        :return: Dict[str "username", Dict[str "pattern name", list[re "regexp"]]]
+        for example: {"LittleshyFIM": {"title": ["derpy", "is"], "text": ["the"], "label": ["best"], "any": ["pony"]}}
+        """
         user_patterns = {}
         for username, pattern_string in self.config_rules["patterns"].items():
 
@@ -63,12 +95,25 @@ class GHIASolver:
         return user_patterns
 
     def get_fallback_label(self):
+        """
+        Gets the fallback label from the configuration rule file if there is such a thing. Otherwise returns None
+
+        :return: string containing the label or None
+        """
         if "fallback" in self.config_rules and "label" in self.config_rules["fallback"]:
             return self.config_rules["fallback"]["label"]
         else:
             return None
 
     def update_users(self, action, user_list, issue_number):
+        """
+        Makes the calls to update assignees
+
+        :param action: specifies what will be done with users in the user list. One of self.ADD REMOVE LEAVE
+        :param user_list: list of strings - usernames, to be affected
+        :param issue_number: an issue number to be affected
+        :return:
+        """
         for username in user_list:
             if not self.dry_run:
                 self.hubcom.update_assignee(action, username, issue_number)
@@ -77,16 +122,35 @@ class GHIASolver:
                 self.namedrop_assignee(action, username)
 
     def does_any_pattern_match(self, pattern_list, string):
+        """
+        Checks if the string supplied matches at least one of the patterns in pattern list
+
+        :param pattern_list: list of regexp patterns
+        :param string: a string for the regexps to be matched against
+        :return: boolean if match was found or not
+        """
         for pattern in pattern_list:
             if pattern.search(string):
                 return True
         return False
 
     def write_fallback(self, message: str):
+        """
+        Writes a fallback message with a four space indentation
+
+        :param message: a fallback message string to write
+        """
         click.secho("   FALLBACK: ", bold=True, nl=False, fg="yellow")
         click.secho(message)
 
     def namedrop_assignee(self, action, username):
+        """
+        Writes a symbol indicating what action will be done and the username provided
+
+        :param action: one of `self.ADD self.REMOVE self.LEAVE`
+        :param username: the str username
+        :return: nothing
+        """
         if action == self.ADD:
             click.secho("   + ", nl=False, fg="green", bold=True)
         if action == self.REMOVE:
@@ -96,6 +160,13 @@ class GHIASolver:
         click.echo(username)
 
     def assign_stuff_to_issue(self, issue):
+        """
+        Mom's spaghetti
+        Figures out which users are already assigned, which are to be assigned and calls correct functions depending on the strategy configured
+
+        :param issue: an issue json as retrieved from github
+        :return: nothing
+        """
         # ---- GET ASSIGNED USERS ----
 
         sorted_assigned_users = [user["login"] for user in issue["assignees"]]
@@ -181,6 +252,14 @@ class GHIASolver:
 
 
 def validate_reposlug(ctx, param, slug: str):
+    """
+    A click validator that check if the reposlug is in owner/reponame format
+
+    :param ctx: mandatory for click validators, not used otherwise
+    :param param: mandatory for click validators, not used otherwise
+    :param slug: the actual string obtained from the user
+    :return: a tuple `(owner, reponame)`
+    """
     parts = slug.split("/")
     if not (len(parts) == 2 and len(parts[0]) > 0 and len(parts[1]) > 0):
         raise click.BadParameter("not in owner/repository format")
@@ -188,6 +267,14 @@ def validate_reposlug(ctx, param, slug: str):
 
 
 def validate_file(ctx, param: click.core.Option, path: str):
+    """
+    Attempts to load the file provided with configparser
+
+    :param ctx: mandatory for click validators, not used otherwise
+    :param param: mandatory for click validators, not used otherwise
+    :param path: actually it's a file obtained open(path, "r") or something along those lines.
+    :return: configparser object
+    """
     try:
         cp = configparser.ConfigParser()
         cp.optionxform = str

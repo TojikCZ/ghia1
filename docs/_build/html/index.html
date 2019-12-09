@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Welcome to GHIA’s documentation! &#8212; GHIA 0.3.3 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Code examples" href="doctests.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-ghia-s-documentation">
+<h1>Welcome to GHIA’s documentation!<a class="headerlink" href="#welcome-to-ghia-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="doctests.html">Code examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">ghia</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ghia.html">ghia package</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>This project is a solution to a homework assignment, hence the garbage code quality</p>
+<p>The app is used to automatically assign issues to specific users based on the content of a github issue.
+To determine if an issue can be assigned to a user, users are associated with regular expressions tied to a specific part of an issue body that will be checked.
+For example: any issue containing the word alicorn in its title goes to <a class="reference external" href="https://mlp.fandom.com/wiki/M._A._Larson">M.A.Larson</a>
+A user is considered assignable if any one of the associated regexps matches.
+If no users are considered assignable, the issue can be given a fallback label.</p>
+<dl>
+<dt>The configuration file looks like this:</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">patterns</span><span class="p">]</span>
+<span class="n">username</span><span class="o">=</span>
+    <span class="n">title</span><span class="p">:</span><span class="n">regexp</span>
+    <span class="n">text</span><span class="p">:</span><span class="n">other_regexp</span>
+    <span class="n">text</span><span class="p">:</span><span class="n">another_regexp</span>
+    <span class="n">label</span><span class="p">:</span><span class="n">not_the_same_regexp</span>
+    <span class="nb">any</span><span class="p">:</span><span class="n">totally_different_regexp</span>
+<span class="n">anotherusername</span><span class="o">=</span>
+    <span class="nb">any</span><span class="p">:</span><span class="n">whatever_regexp</span>
+
+<span class="p">[</span><span class="n">fallback</span><span class="p">]</span>
+<span class="n">label</span><span class="o">=</span><span class="n">Need</span> <span class="n">assignment</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>As you can see, there can be multiple of the same type like “text” which is valid</p>
+<p>This app also needs credentials to be able to make any changes.
+This means that a github account that has collaborator access to the repo you want to manage is required.
+You need to generate an api key with repo scope checked in github settings -&gt; developer settings -&gt; personal access tokens
+This token is then stored in another configparser file looking like so</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">github</span><span class="p">]</span>
+<span class="n">token</span><span class="p">:</span> <span class="n">verysecretstuffgoeshere</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>The app is split into two parts:</p>
+<ul class="simple">
+<li><p>the command line utility that can be run manually or scheduled through automation software to run periodically</p></li>
+<li><p>the web version that can be deployed and triggered through github webhooks</p></li>
+</ul>
+<p><strong>Webhooks</strong> react to an event in a github repository. They can be filtered by an event type and secured by a shared secret.</p>
+<p>This app supports webhooks. For those to be secure the same secret has to be configured on both sides.
+For this, the authentication config contains another field: <cite>secret: verysecretstuffgoeshere</cite>
+On github, the secret can be set under your_repo -&gt; repo settings -&gt; webhooks -&gt; your_webhook -&gt; secret</p>
+<p>There are multiple modes of operation:</p>
+<ul class="simple">
+<li><p><strong>append</strong> - which appends all unassigned assignable users</p></li>
+<li><p><strong>set</strong> - which appends the assignable users only if there are none assigned already</p></li>
+<li><p><strong>change</strong> - which removes all that are not assignable and assigns those who are</p></li>
+</ul>
+<p>Those can be set in the cmd line argument and in the flask config in <cite>ghia_root/ghia/flask_config.json</cite></p>
+<p>There is also an option for dry running, which does not make any actual changes, but says which would be done.</p>
+<p>For the command line version to know which repo is to be affected, a reposlug is expected.
+It consists of two parts owner_username and repo_name separated by a slash. For example: <cite>erkin/ponysay</cite></p>
+<p>Example use of the command line: <cite>ghia –strategy append –config-rules rules.cfg –config-auth auth.cfg erkin/ponysay</cite></p>
+<p>The web version is running at <a class="reference external" href="https://tojik.pythonanywhere.com/">tojik.pythonAnywhere.com</a></p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>In the ideal world installation would be done through <cite>pip install ghia</cite>.
+Because this is a useless school project it’s <cite>pip install -i https://test.pypi.org/simple/ ghia-joziftom</cite></p>
+<p>you can also run <cite>python setup.py install</cite></p>
+<p>For deployment of the flask app, environment variable GHIA_CONFIG has to be present and has to contain paths to the rule config and the credential config separated by a colon “:”
+Then follow the instructions for deployment on your platform</p>
+<p>for PythonAnywhere the wsgi file should look like so:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">project_home</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39;/home/username/ghia_root_directory&#39;</span>
+<span class="k">if</span> <span class="n">project_home</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="n">project_home</span><span class="p">]</span> <span class="o">+</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="n">load_dotenv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project_home</span><span class="p">,</span> <span class="s1">&#39;.env&#39;</span><span class="p">))</span>
+
+<span class="c1"># import flask app but need to call it &quot;application&quot; for WSGI to work</span>
+<span class="kn">from</span> <span class="nn">ghia</span> <span class="kn">import</span> <span class="n">create_app</span>
+<span class="n">application</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>and the .env in ghia_root will need to contain the GHIA_CONFIG variable export for example:
+<cite>export GHIA_CONFIG=credential.cfg:rules.cfg</cite></p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">GHIA</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="doctests.html">Code examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">ghia</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="doctests.html" title="next chapter">Code examples</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Tojik.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

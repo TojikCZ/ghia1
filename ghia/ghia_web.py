@@ -13,6 +13,12 @@ from ghia.ghia_cmd import GHIASolver
 REACT_TO = {"opened", "edited", "transferred", "reopened", "assigned", "unassigned", "labeled", "unlabeled"}
 
 def load_config(path: str):
+    """
+    An alternative for loading configuration files without click
+
+    :param path: a path to a configparser parsable file
+    :return: a configparser object
+    """
     try:
         with open(path) as file:
             cp = configparser.ConfigParser()
@@ -25,6 +31,13 @@ def load_config(path: str):
         raise click.BadParameter("incorrect configuration format")
 
 def react_to_hook(app, json_data):
+    """
+    Configures the solver according to github provided json_data and the app config, then calls the solver to analyze and modify the assignees on the specified issue
+
+    :param app: The flask app object
+    :param json_data: The json data as received from the HTTP POST from github
+    :return: nothing
+    """
     reposlug = (json_data["repository"]["owner"]["login"], json_data["repository"]["name"])
     strategy = app.config.get("strategy", "append")
     dry_run = app.config.get("dry_run", False)
@@ -33,14 +46,16 @@ def react_to_hook(app, json_data):
 
     issue = json_data["issue"]
 
-    user_patterns = app.config["user_patterns"]
-    fallback_label = app.config["fallback_label"]
-
-    session = app.config["session"]
-
     ghia_solver.assign_stuff_to_issue(issue)
 
 def create_app(some_argument):
+    """
+    Initializes the flask app with configfiles set in env variable
+    GHIA_CONFIG - the paths to config files separated by ":" There are two files expected. rules and auth config file
+
+    :param some_argument: idk, but has to be there
+    :return: the flask app object
+    """
     app = flask.Flask(__name__)
     app.config.from_json("flask_config.json")
 
@@ -83,10 +98,23 @@ def create_app(some_argument):
 
     @app.route("/", methods=["GET"])
     def index():
+        """
+        Draws a templated page showing the current loaded configuration
+
+        :return: http response
+        """
         return render_template("homepage.html", username=user_info["login"], user_patterns=user_patterns, fallback_label=fallback_label)
 
     @app.route("/", methods=["POST"])
     def webhook():
+        """
+        Reacts to a webhook from github, that means it confirms that the message digest matches the one provided in the header of the request
+        This digest is obtained as a sha1 HMAC using a configured secret. This secret is set in github settings and in the auth config file
+        then confirms it is the right webhook named "issues" and the action is one of the specified in REACT_TO and the issue is open
+        and if everything checks out it lets the function `react_to()` try and assign users according to configuration
+
+        :return: Flask app object
+        """
         try:
             if secret is not None:
                 received_signature = request.headers['X-Hub-Signature'].split("sha1=")[1]

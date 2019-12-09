@@ -1,0 +1,85 @@
+Introduction
+============
+
+Description
+-----------
+
+This project is a solution to a homework assignment, hence the garbage code quality
+
+The app is used to automatically assign issues to specific users based on the content of the issue.
+If a specific part matches a regexp under a username, that user is considered assignable.
+If none of the users are considered assignable, the issue can be given a fallback label.
+
+The configuration file looks like this:
+ .. codeblock configparser
+    [patterns]
+    username=
+        title:regexp
+        text:other_regexp
+        text:another_regexp
+        label:not_the_same_regexp
+        any:totally_different_regexp
+    anotherusername=
+        any:whatever_regexp
+
+    [fallback]
+    label=Need assignment
+
+As you can see, there can be multiple of the same type like "text" which is valid
+
+This app also needs credentials to be able to make any changes.
+This means that a github account that has admin access to the repo you want to manage is required
+You need to generate an api key with repo scope checked in github settings -> developer settings -> personal access tokens
+This token is then stored in another configparser file looking like so
+
+ .. codeblock configparser
+    [github]
+    token: verysecretstuffgoeshere
+
+The app is split into two parts:
+* the command line utility that can be run manually or scheduled through automation software to run periodically
+* the web verson that can be deployed and activated through github webhooks
+
+**Webhooks** react to an event in a github repository, they can be constrained by a type of event and secured by a secret
+
+This app supports webhooks. For those to be secure a secret has to be configured on both sides.
+For this, the authentication config contains another field: `secret: verysecretstuffgoeshere`
+On github, the secret can e set under your_repo -> repo settings -> webhooks -> secret
+
+There are multiple modes of operation:
+* **append** - which appends all unassigned assignable users
+* **set** - which appends the assignable users only if there are none assigned already
+* **change** - which removes all that are not assignable and assigns those who are
+
+Those can be set in the cmd line argument and in the flask config in `ghia_root/ghia/flask_config.json`
+
+The rest command line arguments can be obtained through `ghia --help`
+
+Installation
+------------
+
+In the ideal world installation would be done through `pip install ghia`.
+Because this is a useless school project it's `pip install -i https://test.pypi.org/simple/ ghia-joziftom`
+
+For deployment of the flask app, environment variable GHIA_CONFIG has to be present and has to contain paths to the rule config and the credential config separated by a colon ":"
+Then follow the instructions for deployment on your platform
+
+for PythonAnywhere the wsgi file will look like so:
+
+ .. codeblock python
+    import sys
+
+    project_home = u'/home/username/ghia_root_directory'
+    if project_home not in sys.path:
+        sys.path = [project_home] + sys.path
+
+    import os
+    from dotenv import load_dotenv
+    load_dotenv(os.path.join(project_home, '.env'))
+
+    # import flask app but need to call it "application" for WSGI to work
+    from ghia import create_app
+    application = create_app(None)
+
+and the .env in ghia_root will need to contain the GHIA_CONFIG variable export for example:
+`export GHIA_CONFIG=credential.cfg:rules.cfg`

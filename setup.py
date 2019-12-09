@@ -1,11 +1,11 @@
 import setuptools
 
-with open('README') as f:
+with open('README.rst') as f:
     long_description = ''.join(f.readlines())
 
 setuptools.setup(
     name='ghia_joziftom',
-    version='0.3.3',
+    version='0.5.0',
     description='Assigns people to issues based on config files',
     long_description=long_description,
     long_description_content_type="text/plain",
