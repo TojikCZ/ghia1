@@ -22,7 +22,9 @@ copyright = '2019, Tojik'
 author = 'Tojik'
 
 # The full version, including alpha/beta/rc tags
-release = '0.3.3'
+release = '0.5.1'
+
+master_doc = "index"
 
 
 # -- General configuration ---------------------------------------------------
