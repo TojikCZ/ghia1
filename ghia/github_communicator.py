@@ -39,7 +39,7 @@ class GithubCommunicator:
     def get_issue_list(self):
         """
         Collects json of all open issues into a list
-Git
+
         :return: List of json issues
         """
         issue_list = []

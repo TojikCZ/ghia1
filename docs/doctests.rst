@@ -23,10 +23,12 @@ I wrote this, so i'm leaving it here.
 
  .. doctest::
 
+    >>> import click
     >>> from ghia.github_communicator import GithubCommunicator
     >>> gcom = GithubCommunicator("abc", "foo", "bar")
     >>> gcom.write_error("You cannot stop the pony references. I am bored out of my mind.", 4)
-
+    >>> click.secho("      Λ", bold=True, fg="red", err=True)
+    >>> click.secho(" That | is not an error, it is a test of an error writing function.", bold=True, fg="red", err=True)
 
 And this is how you namedrop Twinkle Sprinkle
 

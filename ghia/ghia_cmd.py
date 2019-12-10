@@ -76,7 +76,7 @@ class GHIASolver:
         Prepares the data from the rule config
 
         :return: Dict[str "username", Dict[str "pattern name", list[re "regexp"]]]
-        for example: {"LittleshyFIM": {"title": ["derpy", "is"], "text": ["the"], "label": ["best"], "any": ["pony"]}}
+                 for example: {"LittleshyFIM": {"title": ["derpy", "is"], "text": ["the"], "label": ["best"], "any": ["pony"]}}
         """
         user_patterns = {}
         for username, pattern_string in self.config_rules["patterns"].items():

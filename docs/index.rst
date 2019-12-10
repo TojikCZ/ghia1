@@ -97,7 +97,10 @@ Installation
 In the ideal world installation would be done through `pip install ghia`.
 Because this is a useless school project it's `pip install -i https://test.pypi.org/simple/ ghia-joziftom`
 
-you can also run `python setup.py install`
+You can also run `python setup.py install`
+
+Ghia depends on packages mentioned in requirements.txt and for building the docummentation you'll need docs/requirements.txt
+To install them run `pip install -r path/to/requirements.txt`
 
 For deployment of the flask app, environment variable GHIA_CONFIG has to be present and has to contain paths to the rule config and the credential config separated by a colon ":"
 Then follow the instructions for deployment on your platform
@@ -122,4 +125,3 @@ for PythonAnywhere the wsgi file should look like so:
 
 and the .env in ghia_root will need to contain the GHIA_CONFIG variable export for example:
 `export GHIA_CONFIG=credential.cfg:rules.cfg`
-

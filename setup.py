@@ -5,7 +5,7 @@ with open('README.rst') as f:
 
 setuptools.setup(
     name='ghia_joziftom',
-    version='0.5.1',
+    version='0.5.2',
     description='Assigns people to issues based on config files',
     long_description=long_description,
     long_description_content_type="text/plain",

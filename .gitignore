@@ -8,3 +8,4 @@ test*
 dist
 build
 *egg-info*
+_build

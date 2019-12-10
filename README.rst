@@ -12,7 +12,9 @@ If no users are considered assignable, the issue can be given a fallback label.
 Generating the documentation
 ============================
 
-From the ghia root dir, `cd docs` folder, then call `make html`.
+For it to work, you'll need to get all the required packages from requirements.txt and docs/requirements.txt.
+This can be done by running `pip install -r path/to/requirements.txt`
+After you gathered all the dependencies go to the docs dir, `cd docs`, then call `make html`.
 Then open the index.html found in the _build directory to view the docummentation.
 
 For running the doctests use `make doctest` in the docs directory.
